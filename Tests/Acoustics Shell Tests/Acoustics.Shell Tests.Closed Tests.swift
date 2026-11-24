@@ -1,7 +1,6 @@
-import Testing
-import Numeric
-
 import Acoustics_Shell
+import Numeric
+import Testing
 
 extension `Acoustics.Shell Tests` {
     /// Shells and barred strips whose modes are known in closed form.
@@ -78,7 +77,8 @@ extension `Acoustics.Shell Tests`.Closed {
                     membrane
                     * (ex[i] * ex[j] + et[i] * et[j] + nu * (ex[i] * et[j] + et[i] * ex[j]) + (1 - nu) / 2 * g[i] * g[j])
                     + bending
-                    * (kx[i] * kx[j] + kt[i] * kt[j] + nu * (kx[i] * kt[j] + kt[i] * kx[j]) + 2 * (1 - nu) * tw[i] * tw[j])
+                    * (kx[i] * kx[j] + kt[i] * kt[j] + nu * (kx[i] * kt[j] + kt[i] * kx[j]) + 2 * (1 - nu) * tw[i]
+                        * tw[j])
             }
         }
         let omega2 = eigenvalues(k)[0] / (rho * h)
@@ -134,7 +134,8 @@ extension `Acoustics.Shell Tests`.Closed {
         let coarse = try Self.cylinder(around: 48, along: 16)
         let fine = try Self.cylinder(around: 96, along: 32)
         for mode in fine {
-            let love = Self.cylinder(radius: 0.1, length: 0.2, thickness: 0.001, material: T.steel, m: mode.m, n: mode.n)
+            let love = Self.cylinder(
+                radius: 0.1, length: 0.2, thickness: 0.001, material: T.steel, m: mode.m, n: mode.n)
             let error = mode.frequency / love - 1
             #expect(mode.n > 6 || abs(error) < 0.02, "m \(mode.m) n \(mode.n): \(mode.frequency) against \(love)")
             if let rough = coarse.first(where: { $0.m == mode.m && $0.n == mode.n }) {
@@ -258,12 +259,15 @@ extension `Acoustics.Shell Tests`.Closed {
         let (a1, a2) = (w * h, b * t)
         let e = (h + t) / 2
         let centroid = a2 * e / (a1 + a2)
-        let inertia = w * h * h * h / 12 + a1 * centroid * centroid + b * t * t * t / 12 + a2 * (e - centroid) * (e - centroid)
+        let inertia =
+            w * h * h * h / 12 + a1 * centroid * centroid + b * t * t * t / 12 + a2 * (e - centroid) * (e - centroid)
         let perLength = 500 * (a1 + a2)
         for (index, mode) in modes.enumerated() {
             let n = Double(index + 1)
             let expected = n * n * Double.pi / (2 * l * l) * (10e9 * inertia / perLength).squareRoot()
-            #expect(abs(mode.frequency.underlying / expected - 1) < 0.01, "\(mode.frequency.underlying) against \(expected)")
+            #expect(
+                abs(mode.frequency.underlying / expected - 1) < 0.01, "\(mode.frequency.underlying) against \(expected)"
+            )
         }
     }
 }

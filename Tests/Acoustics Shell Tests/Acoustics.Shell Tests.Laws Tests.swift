@@ -1,6 +1,5 @@
-import Testing
-
 import Acoustics_Shell
+import Testing
 
 extension `Acoustics.Shell Tests` {
     @Suite struct Laws {}
@@ -29,7 +28,9 @@ extension `Acoustics.Shell Tests`.Laws {
         )
         let flat = try Mesh<Point<2, Double>>(
             vertices: mesh.vertices.map { Point(x: $0.x, y: $0.y) },
-            faces: mesh.faces.map { face in try Polygon(vertices: face.vertices.map { Index(Ordinal(UInt(Int(bitPattern: $0)))) }) }
+            faces: mesh.faces.map { face in
+                try Polygon(vertices: face.vertices.map { Index(Ordinal(UInt(Int(bitPattern: $0)))) })
+            }
         )
         let plate = Acoustics.Plate(mesh: flat, thickness: T.metres(0.003), material: Self.spruce, edge: .clamped)
         let shellModes = try Acoustics.Shell.Modes(shell, count: 6)
@@ -77,7 +78,8 @@ extension `Acoustics.Shell Tests`.Laws {
             v.scaled(by: c) + axis.cross(v).scaled(by: s) + axis.scaled(by: axis.dot(v) * (1 - c))
         }
         func shell(_ place: (Vector<3, Double>) -> Vector<3, Double>) throws -> Acoustics.Shell {
-            let moved = try Mesh(vertices: mesh.vertices.map { Point(coordinates: place(curved($0))) }, faces: mesh.faces)
+            let moved = try Mesh(
+                vertices: mesh.vertices.map { Point(coordinates: place(curved($0))) }, faces: mesh.faces)
             let corners = [0, 8, mesh.vertices.count - 9, mesh.vertices.count - 1]
             return Acoustics.Shell(
                 mesh: moved,

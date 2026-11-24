@@ -168,7 +168,9 @@ extension Acoustics.Shell.Facet {
 extension Acoustics.Shell.Facet {
     /// The part of the segment from `start` to `end`, laid into the facet's plane, that lies inside it: its ends
     /// in the facet's axes and the share of it that counts here, a half where it runs along the facet's edge.
-    func clip(_ start: Point<3, Double>, _ end: Point<3, Double>) -> (from: (Double, Double), to: (Double, Double), share: Double)? {
+    func clip(_ start: Point<3, Double>, _ end: Point<3, Double>) -> (
+        from: (Double, Double), to: (Double, Double), share: Double
+    )? {
         let a = local(start)
         let b = local(end)
         var low = 0.0
@@ -229,7 +231,10 @@ extension Acoustics.Shell.Facet {
                 for c in 0..<24 where row[c] != 0 { matrix[24 * a + c] += scale * row[a] * row[c] }
             }
         }
-        func rows(at s: Double) -> (g: (values: [Double], x: [Double], y: [Double], area: Double), axial: [Double], curvature: [Double], twist: [Double], shear: [Double]) {
+        func rows(at s: Double) -> (
+            g: (values: [Double], x: [Double], y: [Double], area: Double), axial: [Double], curvature: [Double],
+            twist: [Double], shear: [Double]
+        ) {
             let point = reference(x: piece.from.0 + s * dx, y: piece.from.1 + s * dy)
             let g = gradients(at: point)
             var axial = [Double](repeating: 0, count: 24)

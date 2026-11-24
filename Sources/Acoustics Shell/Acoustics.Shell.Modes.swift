@@ -57,7 +57,8 @@ extension Acoustics.Shell.System {
         var facets: [Acoustics.Shell.Facet] = []
         for (index, face) in shell.mesh.faces.enumerated() {
             let corners = face.vertices.map { Int(bitPattern: $0) }
-            guard corners.count == 4, let facet = Acoustics.Shell.Facet(corners: corners, points: points, grain: shell.grain)
+            guard corners.count == 4,
+                let facet = Acoustics.Shell.Facet(corners: corners, points: points, grain: shell.grain)
             else { throw .face(index) }
             facets.append(facet)
         }
