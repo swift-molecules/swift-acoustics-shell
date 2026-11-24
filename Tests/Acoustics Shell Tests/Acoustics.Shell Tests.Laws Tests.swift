@@ -79,7 +79,9 @@ extension `Acoustics.Shell Tests`.Laws {
         }
         func shell(_ place: (Vector<3, Double>) -> Vector<3, Double>) throws -> Acoustics.Shell {
             let moved = try Mesh(
-                vertices: mesh.vertices.map { Point(coordinates: place(curved($0))) }, faces: mesh.faces)
+                vertices: mesh.vertices.map { Point(coordinates: place(curved($0))) },
+                faces: mesh.faces
+            )
             let corners = [0, 8, mesh.vertices.count - 9, mesh.vertices.count - 1]
             return Acoustics.Shell(
                 mesh: moved,

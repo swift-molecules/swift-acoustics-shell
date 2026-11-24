@@ -166,11 +166,16 @@ extension Acoustics.Shell.Facet {
 }
 
 extension Acoustics.Shell.Facet {
+    /// The part of a bar inside a facet: its ends in the facet's axes, and the share of it that counts here.
+    typealias Piece = (from: (Double, Double), to: (Double, Double), share: Double)
+
+    /// At a point of a bar, the shape functions and the rows over the facet's 24 unknowns of the bar's stretching
+    /// along its line, its curvature, its twist and its shear.
+    typealias Strains = (values: [Double], axial: [Double], curvature: [Double], twist: [Double], shear: [Double])
+
     /// The part of the segment from `start` to `end`, laid into the facet's plane, that lies inside it: its ends
     /// in the facet's axes and the share of it that counts here, a half where it runs along the facet's edge.
-    func clip(_ start: Point<3, Double>, _ end: Point<3, Double>) -> (
-        from: (Double, Double), to: (Double, Double), share: Double
-    )? {
+    func clip(_ start: Point<3, Double>, _ end: Point<3, Double>) -> Piece? {
         let a = local(start)
         let b = local(end)
         var low = 0.0
@@ -231,10 +236,7 @@ extension Acoustics.Shell.Facet {
                 for c in 0..<24 where row[c] != 0 { matrix[24 * a + c] += scale * row[a] * row[c] }
             }
         }
-        func rows(at s: Double) -> (
-            g: (values: [Double], x: [Double], y: [Double], area: Double), axial: [Double], curvature: [Double],
-            twist: [Double], shear: [Double]
-        ) {
+        func rows(at s: Double) -> Strains {
             let point = reference(x: piece.from.0 + s * dx, y: piece.from.1 + s * dy)
             let g = gradients(at: point)
             var axial = [Double](repeating: 0, count: 24)
@@ -254,7 +256,7 @@ extension Acoustics.Shell.Facet {
                 shearing[6 * i + 4] = g.values[i] * sx
                 shearing[6 * i + 3] = -g.values[i] * sy
             }
-            return (g, axial, curvature, turning, shearing)
+            return (g.values, axial, curvature, turning, shearing)
         }
         let rule = Galerkin.Quadrature<1, Double>.gauss(count: 3)
         for (node, weight) in zip(rule.nodes, rule.weights) {
@@ -270,7 +272,7 @@ extension Acoustics.Shell.Facet {
             var my = mx
             var mz = mx
             for i in 0..<4 {
-                let n = at.g.values[i]
+                let n = at.values[i]
                 mx[6 * i] = n
                 mx[6 * i + 4] = e * n
                 my[6 * i + 1] = n

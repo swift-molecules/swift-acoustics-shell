@@ -73,12 +73,11 @@ extension `Acoustics.Shell Tests`.Closed {
         var k = [[Double]](repeating: [0, 0, 0], count: 3)
         for i in 0..<3 {
             for j in 0..<3 {
-                k[i][j] =
-                    membrane
-                    * (ex[i] * ex[j] + et[i] * et[j] + nu * (ex[i] * et[j] + et[i] * ex[j]) + (1 - nu) / 2 * g[i] * g[j])
-                    + bending
-                    * (kx[i] * kx[j] + kt[i] * kt[j] + nu * (kx[i] * kt[j] + kt[i] * kx[j]) + 2 * (1 - nu) * tw[i]
-                        * tw[j])
+                let normal = ex[i] * ex[j] + et[i] * et[j] + nu * (ex[i] * et[j] + et[i] * ex[j])
+                let stretch = normal + (1 - nu) / 2 * g[i] * g[j]
+                let curving = kx[i] * kx[j] + kt[i] * kt[j] + nu * (kx[i] * kt[j] + kt[i] * kx[j])
+                let bend = curving + 2 * (1 - nu) * tw[i] * tw[j]
+                k[i][j] = membrane * stretch + bending * bend
             }
         }
         let omega2 = eigenvalues(k)[0] / (rho * h)
@@ -135,7 +134,13 @@ extension `Acoustics.Shell Tests`.Closed {
         let fine = try Self.cylinder(around: 96, along: 32)
         for mode in fine {
             let love = Self.cylinder(
-                radius: 0.1, length: 0.2, thickness: 0.001, material: T.steel, m: mode.m, n: mode.n)
+                radius: 0.1,
+                length: 0.2,
+                thickness: 0.001,
+                material: T.steel,
+                m: mode.m,
+                n: mode.n
+            )
             let error = mode.frequency / love - 1
             #expect(mode.n > 6 || abs(error) < 0.02, "m \(mode.m) n \(mode.n): \(mode.frequency) against \(love)")
             if let rough = coarse.first(where: { $0.m == mode.m && $0.n == mode.n }) {
@@ -265,9 +270,8 @@ extension `Acoustics.Shell Tests`.Closed {
         for (index, mode) in modes.enumerated() {
             let n = Double(index + 1)
             let expected = n * n * Double.pi / (2 * l * l) * (10e9 * inertia / perLength).squareRoot()
-            #expect(
-                abs(mode.frequency.underlying / expected - 1) < 0.01, "\(mode.frequency.underlying) against \(expected)"
-            )
+            let found = mode.frequency.underlying
+            #expect(abs(found / expected - 1) < 0.01, "\(found) against \(expected)")
         }
     }
 }
