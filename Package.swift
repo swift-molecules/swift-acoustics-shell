@@ -19,6 +19,8 @@ let package = Package(
         .package(url: "https://github.com/swift-molecules/swift-galerkin.git", branch: "main"),
         .package(url: "https://github.com/swift-molecules/swift-sparse.git", branch: "main"),
         .package(url: "https://github.com/swift-molecules/swift-eigen.git", branch: "main"),
+        .package(url: "https://github.com/swift-molecules/swift-acoustics-plate.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-numeric.git", branch: "main"),
     ],
     targets: [
         .target(
@@ -28,12 +30,14 @@ let package = Package(
                 .product(name: "Galerkin", package: "swift-galerkin"),
                 .product(name: "Sparse", package: "swift-sparse"),
                 .product(name: "Eigen", package: "swift-eigen"),
+                .product(name: "Acoustics Plate", package: "swift-acoustics-plate"),
             ]
         ),
         .testTarget(
             name: "Acoustics Shell Tests",
             dependencies: [
-                .target(name: "Acoustics Shell")
+                .target(name: "Acoustics Shell"),
+                .product(name: "Numeric", package: "swift-numeric"),
             ]
         ),
     ],
