@@ -48,7 +48,7 @@ extension `Acoustics.Shell Tests` {
         .isotropic(
             density: Density.amount(density),
             young: Modulus.Young.pascals(young),
-            poisson: Poisson.amount(poisson)
+            poisson: Strain.Ratio.amount(poisson)
         )
     }
 
